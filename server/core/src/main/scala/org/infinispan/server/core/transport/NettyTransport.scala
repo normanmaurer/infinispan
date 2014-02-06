@@ -21,6 +21,7 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.{Channel, ChannelInitializer, ChannelOption}
 import io.netty.channel.nio.NioEventLoopGroup
 import io.netty.channel.socket.nio.NioServerSocketChannel
+import io.netty.buffer.PooledByteBufAllocator
 
 /**
  * A Netty based transport.
@@ -75,6 +76,7 @@ class NettyTransport(server: ProtocolServer, handler: ChannelInitializer[Channel
       bootstrap.group(masterGroup, workerGroup)
       bootstrap.channel(classOf[NioServerSocketChannel])
       bootstrap.childHandler(handler)
+      bootstrap.childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
       bootstrap.childOption[java.lang.Boolean](ChannelOption.TCP_NODELAY, configuration.tcpNoDelay) // Sets server side tcpNoDelay
       if (configuration.sendBufSize > 0)
          bootstrap.childOption[java.lang.Integer](ChannelOption.SO_SNDBUF, configuration.sendBufSize) // Sets server side send buffer
