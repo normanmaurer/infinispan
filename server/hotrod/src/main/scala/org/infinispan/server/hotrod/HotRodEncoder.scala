@@ -7,6 +7,7 @@ import org.infinispan.remoting.transport.Address
 import org.infinispan.commons.util.Util
 import io.netty.handler.codec.MessageToMessageEncoder
 import io.netty.channel.ChannelHandlerContext
+import io.netty.channel.ChannelHandler.Sharable
 
 /**
  * Hot Rod specific encoder.
@@ -14,6 +15,7 @@ import io.netty.channel.ChannelHandlerContext
  * @author Galder Zamarreño
  * @since 4.1
  */
+@Sharable
 class HotRodEncoder(cacheManager: EmbeddedCacheManager, server: HotRodServer)
         extends MessageToMessageEncoder[Response] with Constants with Log {
 
