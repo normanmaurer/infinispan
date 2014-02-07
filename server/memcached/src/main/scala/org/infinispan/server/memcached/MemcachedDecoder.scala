@@ -1,7 +1,7 @@
 package org.infinispan.server.memcached
 
 import _root_.io.netty.buffer.ByteBuf
-import _root_.io.netty.channel.Channel
+import _root_.io.netty.channel.{ChannelHandlerContext, Channel}
 import logging.Log
 import org.infinispan.server.core.Operation._
 import org.infinispan.server.memcached.MemcachedOperation._
@@ -26,6 +26,8 @@ import scala.Some
 import org.infinispan.metadata.Metadata
 import org.infinispan.container.versioning.NumericVersion
 import org.infinispan.commons.CacheException
+import scala.Some
+import java.util
 
 /**
  * A Memcached protocol specific decoder
@@ -58,7 +60,17 @@ class MemcachedDecoder(memcachedCache: AdvancedCache[String, Array[Byte]], sched
    private val isTrace = isTraceEnabled
    private val byteBuffer = new ByteArrayOutputStream()
 
-   override def createHeader: RequestHeader = new RequestHeader
+
+  override def decode(ctx: ChannelHandlerContext, in: ByteBuf, out: util.List[AnyRef]): Unit = {
+    try {
+      super.decode(ctx, in, out)
+    } finally {
+      // reset in all cases
+      byteBuffer.reset()
+    }
+  }
+
+  override def createHeader: RequestHeader = new RequestHeader
 
    override def readHeader(buffer: ByteBuf, header: RequestHeader): Option[Boolean] = {
       var endOfOp = readElement(buffer, byteBuffer)
@@ -89,7 +101,6 @@ class MemcachedDecoder(memcachedCache: AdvancedCache[String, Array[Byte]], sched
    }
 
    private def readKeys(b: ByteBuf): Seq[String] = readSplitLine(b)
-
    override protected def get(buffer: ByteBuf): AnyRef = {
       val keys = readKeys(buffer)
       if (keys.length > 1) {

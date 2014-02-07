@@ -536,7 +536,6 @@ private class ClientHandler(rspTimeoutSeconds: Int) extends ChannelInboundHandle
    private val responses = new ConcurrentHashMap[Long, TestResponse]
 
    override def channelRead(ctx: ChannelHandlerContext, msg: AnyRef) {
-      System.out.println("msg=" + msg)
       val resp = msg.asInstanceOf[TestResponse]
       trace("Put %s in responses", resp)
       responses.put(resp.messageId, resp)
