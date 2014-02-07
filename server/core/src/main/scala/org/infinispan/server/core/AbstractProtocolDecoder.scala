@@ -63,7 +63,7 @@ abstract class AbstractProtocolDecoder[K, V](transport: NettyTransport)
         // we need to fire the exception explicitly so that requests can
         // carry on being processed on same connection after a client error
         if (isClientError) {
-          ctx.fireExceptionCaught(serverException)
+          ctx.pipeline.fireExceptionCaught(serverException)
           null
         } else {
           throw serverException
@@ -157,12 +157,14 @@ abstract class AbstractProtocolDecoder[K, V](transport: NettyTransport)
             if (isTrace) trace("Write response %s", response)
             response match {
                // We only expect Lists of ChannelBuffer instances, so don't worry about type erasure
-               case l: Array[ByteBuf] => l.foreach(ch.write(_))
-               case a: Array[Byte] => ch.write(wrappedBuffer(a))
-               case cs: CharSequence => ch.write(Unpooled.copiedBuffer(cs, CharsetUtil.UTF_8))
-               case _ => ch.write(response)
+               case l: Array[ByteBuf] => {
+                 l.foreach(ch.write(_))
+                 ch.flush
+               }
+               case a: Array[Byte] => ch.writeAndFlush(wrappedBuffer(a))
+               case cs: CharSequence => ch.writeAndFlush(Unpooled.copiedBuffer(cs, CharsetUtil.UTF_8))
+               case _ => ch.writeAndFlush(response)
             }
-           ch.flush
          }
          null
       } finally {
@@ -267,12 +269,11 @@ abstract class AbstractProtocolDecoder[K, V](transport: NettyTransport)
          val errorResponse = createErrorResponse(cause)
          if (errorResponse != null) {
             errorResponse match {
-               case a: Array[Byte] => ch.write(wrappedBuffer(a))
-               case cs: CharSequence => ch.write(Unpooled.copiedBuffer(cs, CharsetUtil.UTF_8))
+               case a: Array[Byte] => ch.writeAndFlush(wrappedBuffer(a))
+               case cs: CharSequence => ch.writeAndFlush(Unpooled.copiedBuffer(cs, CharsetUtil.UTF_8))
                case null => // ignore
-               case _ => ch.write(errorResponse)
+               case _ => ch.writeAndFlush(errorResponse)
             }
-            ch.flush
          }
       }
       // After writing back an error, reset params and revert to initial state
