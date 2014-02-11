@@ -84,7 +84,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Object> 
           if (handshaker == null) {
               WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
           } else {
-              // fuehre den Handshake
               handshaker.handshake(ctx.channel(), req).addListener(new ChannelFutureListener() {
                   @Override
                   public void operationComplete(ChannelFuture future) throws Exception {

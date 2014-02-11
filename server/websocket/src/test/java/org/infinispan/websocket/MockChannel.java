@@ -103,7 +103,7 @@ public class MockChannel implements Channel {
 
     @Override
     public boolean isOpen() {
-        return false;
+        return true;
     }
 
     @Override
@@ -243,7 +243,8 @@ public class MockChannel implements Channel {
 
     @Override
     public ChannelFuture write(Object msg, ChannelPromise promise) {
-        return null;
+        write(msg);
+        return promise.setSuccess();
     }
 
     @Override
@@ -253,11 +254,13 @@ public class MockChannel implements Channel {
 
     @Override
     public ChannelFuture writeAndFlush(Object msg, ChannelPromise promise) {
-        return null;
+        write(msg);
+        return promise.setSuccess();
     }
 
     @Override
     public ChannelFuture writeAndFlush(Object msg) {
+        write(msg);
         return null;
     }
 
