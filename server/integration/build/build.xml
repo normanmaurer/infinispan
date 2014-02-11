@@ -127,6 +127,10 @@
          <maven-resource group="io.netty" artifact="netty" />
       </module-def>
 
+      <module-def name="io.netty">
+         <maven-resource group="io.netty" artifact="netty-all" />
+      </module-def>
+
       <module-def name="org.fusesource.leveldbjni-all" src="${infinispan.server.modules.dir}">
          <maven-resource group="org.fusesource.leveldbjni" artifact="leveldbjni-all" />
       </module-def>
